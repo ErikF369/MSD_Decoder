@@ -1,0 +1,155 @@
+MSDASN1V2
+DEFINITIONS
+AUTOMATIC TAGS ::=
+BEGIN
+    CurrentVersion::= INTEGER (2)
+    ECallMessage ::= SEQUENCE {
+        msdVersion INTEGER(0 .. 255),
+        msd OCTET STRING (CONTAINING MSDMessage)
+    }
+    MSDMessage ::= SEQUENCE {
+        msdStructure MSDStructure,
+        optionalAdditionalData AdditionalData OPTIONAL,
+        ...
+    }
+    MSDStructure ::= SEQUENCE {
+        messageIdentifier INTEGER(0 .. 255),
+        control ControlType,
+        vehicleIdentificationNumber VIN,
+        vehiclePropulsionStorageType VehiclePropulsionStorageType,
+        timestamp INTEGER(0 .. 4294967295),
+        vehicleLocation VehicleLocation,
+        vehicleDirection INTEGER(0 .. 255),
+        recentVehicleLocationN1 VehicleLocationDelta OPTIONAL,
+        recentVehicleLocationN2 VehicleLocationDelta OPTIONAL,
+        numberOfPassengers INTEGER(0 .. 255) OPTIONAL,
+        ...
+    }
+    ControlType ::= SEQUENCE {
+        automaticActivation BOOLEAN,
+        testCall BOOLEAN,
+        positionCanBeTrusted BOOLEAN,
+        vehicleType VehicleType
+    }
+    VehicleType ::= ENUMERATED{
+        passengerVehicleClassM1 (1),
+        busesAndCoachesClassM2 (2),
+        busesAndCoachesClassM3 (3),
+        lightCommercialVehiclesClassN1 (4),
+        heavyDutyVehiclesClassN2 (5),
+        heavyDutyVehiclesClassN3 (6),
+        motorcyclesClassL1e (7),
+        motorcyclesClassL2e (8),
+        motorcyclesClassL3e (9),
+        motorcyclesClassL4e (10),
+        motorcyclesClassL5e (11),
+        motorcyclesClassL6e (12),
+        motorcyclesClassL7e (13),
+        ...
+    }
+    VIN ::= SEQUENCE {
+        isowmi PrintableString (SIZE(3)) (FROM("A".."H"|"J".."N"|"P"|"R".."Z"|"0".."9")),
+        isovds PrintableString (SIZE(6)) (FROM("A".."H"|"J".."N"|"P"|"R".."Z"|"0".."9")),
+        isovisModelyear PrintableString (SIZE(1)) (FROM("A".."H"|"J".."N"|"P"|"R".."Z"|"0".."9")),
+        isovisSeqPlant PrintableString (SIZE(7)) (FROM("A".."H"|"J".."N"|"P"|"R".."Z"|"0".."9"))
+    }
+    VehiclePropulsionStorageType ::= SEQUENCE {
+        gasolineTankPresent BOOLEAN DEFAULT FALSE,
+        dieselTankPresent BOOLEAN DEFAULT FALSE,
+        compressedNaturalGas BOOLEAN DEFAULT FALSE,
+        liquidPropaneGas BOOLEAN DEFAULT FALSE,
+        electricEnergyStorage BOOLEAN DEFAULT FALSE,
+        hydrogenStorage BOOLEAN DEFAULT FALSE,
+        otherStorage BOOLEAN DEFAULT FALSE,
+        ...
+    }
+    VehicleLocation ::= SEQUENCE {
+        positionLatitude INTEGER(-2147483648..2147483647),
+        positionLongitude INTEGER(-2147483648..2147483647)
+    }
+    VehicleLocationDelta ::= SEQUENCE {
+        latitudeDelta INTEGER (-512..511),
+        longitudeDelta INTEGER (-512..511)
+    }
+    AdditionalData ::= SEQUENCE {
+        oid OBJECT IDENTIFIER,
+        data OCTET STRING (CONTAINING ESDMessage)
+    }
+    ESDMessage ::= SEQUENCE {
+        esdVersion INTEGER(0 .. 255),
+        esdStructure ESDStructure,
+        deltaV IIDeltaV
+    }
+    ESDStructure ::= SEQUENCE {
+        vehicleLanguage VehicleLanguage,
+        crashData CrashData,
+        crashEntity CrashEntity,
+        triggerReason TriggerReason,
+        additionalCallbackNumber AdditionalCallbackNumber,
+        roadType RoadType,
+        extendedPositionPearlChain ExtendedPositionPearlChain
+    }
+    VehicleLanguage ::= SEQUENCE {
+        country PrintableString (SIZE(2)) (FROM("A".."Z")),
+        language PrintableString (SIZE(2)) (FROM("a".."z"))
+    }
+    CrashData ::= SEQUENCE {
+        crashSeverity INTEGER(0 .. 255),
+        crashFrontOccurrence BOOLEAN,
+        crashLeftOccurrence BOOLEAN,
+        crashRightOccurrence BOOLEAN,
+        crashRearOccurrence BOOLEAN,
+        crashRolloverOccurrence BOOLEAN,
+        vehicleTemperature INTEGER(-50 .. 255)
+    }
+    CrashEntity ::= ENUMERATED{
+        unknown (0),
+        pedestrian (1),
+        bike (2),
+        car (3),
+        truck (4),
+        ...
+    }
+    TriggerReason ::= ENUMERATED{
+        notAvailable (0),
+        manualActivation (1),
+        lightCrash (2),
+        emergencyAssist (3),
+        pedestrianProtection (4),
+        healthWearable (5),
+        phoneApp (6),
+        childPresenceDetection (7),
+        ...
+    }
+    AdditionalCallbackNumber ::= SEQUENCE {
+        callbackNumber1 OCTET STRING(SIZE (8)),
+        callbackNumber2 OCTET STRING(SIZE (8))
+    }
+    RoadType ::= ENUMERATED{
+        notAvailable (0),
+        motorway (1),
+        intercityMotorway (2),
+        nationalClassRoad (3),
+        majorRoad (4),
+        provincialRoad (5),
+        ruralRoad (6),
+        narrowStreet (7),
+        offRoad (8),
+        ...
+    }
+    ExtendedPositionPearlChain ::= SEQUENCE {
+        recentVehicleLocationN3 VehicleLocationDelta,
+        recentVehicleLocationN4 VehicleLocationDelta,
+        recentVehicleLocationN5 VehicleLocationDelta,
+        recentVehicleLocationN6 VehicleLocationDelta,
+        recentVehicleLocationN7 VehicleLocationDelta,
+        recentVehicleLocationN8 VehicleLocationDelta,
+        recentVehicleLocationN9 VehicleLocationDelta
+    }
+    IIDeltaV ::= SEQUENCE {
+        rangeLimit INTEGER(100..255),
+        deltaVX INTEGER(-255..255),
+        deltaVY INTEGER(-255..255),
+        ...
+    }
+END
